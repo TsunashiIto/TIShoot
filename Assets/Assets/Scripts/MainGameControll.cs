@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 /// 初期ボム数 bomb
 /// 最大ボム数 maxBomb
 /// 難易度 initDifficulty
+/// ゲームオーバーの管理
 /// </summary>
 public class MainGameControll : MonoBehaviour {
 
@@ -23,6 +24,7 @@ public class MainGameControll : MonoBehaviour {
 	public Transform[] jikis;
 	public Transform jiki;
 	public int initDifficulty = 3;
+	public bool isContinueEnable = false;
 
 	private int StageNum = 0;//現在のステージのインデックス
 
@@ -44,19 +46,22 @@ public class MainGameControll : MonoBehaviour {
 		GameManager.OnDestroyBoss += this.OnDestroyBoss;
 		GameManager.OnContinue += this.OnContinue;
 		GameManager.OnGameOver += this.OnGameOver;
+		ContinueController.OnGameOver += this.OnGameOver;
+		ContinueController.InvokeContinue += this.InvokeContinue;
 	}
 
 	void OnDisable(){
 		TitleController.GAMESTART -= this.GAMESTART;
 		GameManager.OnDestroyBoss -= this.OnDestroyBoss;
 		GameManager.OnContinue -= this.OnContinue;
-		GameManager.OnGameOver -= this.OnGameOver;		
+		GameManager.OnGameOver -= this.OnGameOver;
+		ContinueController.OnGameOver -= this.OnGameOver;
+		ContinueController.InvokeContinue -= this.InvokeContinue;
 	}
 
 	// Use this for initialization
 	void Start () {
 		SceneManager.LoadScene ("SceneTitle", LoadSceneMode.Additive);
-
 	}
 	
 
@@ -95,8 +100,20 @@ public class MainGameControll : MonoBehaviour {
 	/// コンティニューのウィンドウを読み込む
 	/// </summary>
 	public void OnContinue(){
-		Time.timeScale = 0;		
+		Time.timeScale = 0;	
+		SceneManager.LoadScene ("ContinueControll",LoadSceneMode.Additive);
+		isContinueEnable = true;
 		Debug.Log ("CONTINUE");
+	}
+
+	/// <summary>
+	/// Invokes continue.
+	/// コンティニューウィンドウを開く
+	/// </summary>
+	public void InvokeContinue(){
+		Time.timeScale = 1;
+		SceneManager.UnloadSceneAsync ("ContinueControll");
+		isContinueEnable = false;
 	}
 
 	/// <summary>
@@ -105,6 +122,15 @@ public class MainGameControll : MonoBehaviour {
 	/// </summary>
 	public void OnGameOver(){
 		Time.timeScale = 1;
+
+		if(isContinueEnable == true){
+			SceneManager.UnloadSceneAsync ("ContinueControll");
+			isContinueEnable = false;
+		}
+		SceneManager.UnloadSceneAsync (2);
+		//ここは後で現在のステージを取得する処理に変更
+		SceneManager.LoadScene ("SceneTitle", LoadSceneMode.Additive);
+		GameObject.Find ("GameManager").GetComponent<GameManager> ().SendMessage ("ResetContinue") ;
 		Debug.Log ("GAMEOVER");
 	}
 

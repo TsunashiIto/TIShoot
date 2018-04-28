@@ -14,7 +14,9 @@ using UnityEngine.Events;
 /// スポーン管理
 /// デス・リスポーン管理
 /// 残機・ゲームオーバー管理
+/// (イベントの配信のみ）
 /// コンティニュー管理
+/// コンティニューYES時の処理
 /// ステージクリア管理
 /// ステージ読み込み等は行わない
 /// </summary>
@@ -23,7 +25,7 @@ public class GameManager : MonoBehaviour {
 	public int maxZanki = 3;
 	public int maxContinue =3;
 	public Transform[] jikis;//自機配列
-	public Transform jiki;//自機p
+	public Transform jiki;//自機prefab
 	private GameObject jikiInstance;//自機インスタンス
 	public int jikiNo = 0;//自機何番目か
 	private int SCORE = 0;
@@ -40,7 +42,6 @@ public class GameManager : MonoBehaviour {
 	public static UnityAction OnContinue;
 	//ゲームオーバー
 	public static UnityAction OnGameOver;
-	//自機やられ
 
 	//singleton
 	public static GameManager Instance { get; private set; }
@@ -140,11 +141,32 @@ public class GameManager : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Respawn this instance.
+	/// リスポーン処理
+	/// </summary>
+	private void Respawn(){
+		Zanki--;
+		jikiInstance = Instantiate(jiki.gameObject,new Vector3(0.0f,0.0f,-20.0f),Quaternion.identity);
+		//スポーンアニメーション再生
+		jikiInstance.SendMessage("SpawnJiki");	
+	}
+
+	/// <summary>
 	/// プレイヤーやられ時の処理
 	/// </summary>
 	public void Death(){
 		Debug.Log ("death");
 		SpawnCommon ();
+	}
+
+	/// <summary>
+	/// コンティニューを初期値に戻す
+	/// 残機を初期値に戻す
+	/// MaingamemanagerのOngameOverからsendmessageで呼ばれる
+	/// </summary>
+	public void ResetContinue(){
+		Continue = maxContinue;
+		Zanki = maxZanki;
 	}
 
 	//メソッド部
@@ -158,8 +180,7 @@ public class GameManager : MonoBehaviour {
 	/// ステージまたぎの場合は
 	/// </summary>
 	public void SpawnCommon(){
-		//SetJiki(0);//そのうち自機セレクト機能が付くのでは
-		Zanki--;
+
 		if (Zanki < 0) {
 			//ゲームオーバー処理（コンティニュー）
 			if (Continue > 0) {
@@ -167,19 +188,22 @@ public class GameManager : MonoBehaviour {
 				Continue--;
 				//イベント配信
 				OnContinue();
-
 				//残機の数を戻す
 				Zanki = maxZanki;
+				Respawn ();
+
 			} else {
 				//ゲームオーバー処理
+				//残機の数を戻す
+				Zanki = maxZanki;
 				OnGameOver();
 			}
 		} else {
-			jikiInstance = Instantiate(jiki.gameObject,new Vector3(0.0f,0.0f,-20.0f),Quaternion.identity);
-			//スポーンアニメーション再生
-			jikiInstance.SendMessage("SpawnJiki");
+			Respawn ();
 		}
 	}
+
+
 
 
 
