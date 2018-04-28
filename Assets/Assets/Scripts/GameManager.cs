@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour {
 	public int maxZanki = 3;
 	public int maxContinue =3;
 	public Transform[] jikis;//自機配列
-	public Transform jiki;//自機ぷれふぁぶ
+	public Transform jiki;//自機p
 	private GameObject jikiInstance;//自機インスタンス
 	public int jikiNo = 0;//自機何番目か
 	private int SCORE = 0;
@@ -61,12 +61,14 @@ public class GameManager : MonoBehaviour {
 		//受信イベント
 		StdEnemyController.EnemyDestroy += this.EnemyDestroy;
 		AbstractStageController.OnSpawn += this.OnSpawn;
+		AbstractJikiControll.Death += this.Death;
 	}
 
 	void OnDisable(){
 		//イベントを削除
 		StdEnemyController.EnemyDestroy -= this.EnemyDestroy;
 		AbstractStageController.OnSpawn -= this.OnSpawn;
+		AbstractJikiControll.Death -= this.Death;
 	}
 
 	// Use this for initialization
@@ -138,28 +140,47 @@ public class GameManager : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// プレイヤーやられ時の処理
+	/// </summary>
+	public void Death(){
+		Debug.Log ("death");
+		SpawnCommon ();
+	}
+
+	//メソッド部
+
+	/// <summary>
 	/// スポーン処理の共通部分
 	/// 残機確認
 	/// ゲームオーバー時のコンティニュー遷移
+	/// maingamecontrollerでUIシーン呼び出し
 	/// 残機がある場合のリスポーン処理
 	/// ステージまたぎの場合は
 	/// </summary>
 	public void SpawnCommon(){
 		//SetJiki(0);//そのうち自機セレクト機能が付くのでは
+		Zanki--;
 		if (Zanki < 0) {
 			//ゲームオーバー処理（コンティニュー）
-			if (Continue < 0) {
+			if (Continue > 0) {
 				//コンティニュー遷移
 				Continue--;
-				//OnContinue();
-				///TODO:コンティニュー時に残機の数を戻す処理
+				//イベント配信
+				OnContinue();
+
+				//残機の数を戻す
+				Zanki = maxZanki;
 			} else {
 				//ゲームオーバー処理
-				//OnGameOver();
+				OnGameOver();
 			}
 		} else {
 			jikiInstance = Instantiate(jiki.gameObject,new Vector3(0.0f,0.0f,-20.0f),Quaternion.identity);
+			//スポーンアニメーション再生
+			jikiInstance.SendMessage("SpawnJiki");
 		}
 	}
+
+
 
 }
