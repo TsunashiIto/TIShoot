@@ -28,7 +28,7 @@ public class StdEnemyController : MonoBehaviour {
 
 	void OnEnable(){
 		//受信イベント
-	
+
 	}
 
 	void OnDisable(){
@@ -61,14 +61,19 @@ public class StdEnemyController : MonoBehaviour {
 		HP -= bulletDamage;
 		Debug.Log (HP);
 		if (HP < 0) {
+			//イベント配信
 			EnemyDestroy (BOSS, ADDSCORE);
 			Destroy (gameObject);
 		}
 	}
 
-	//この関数はテスト中
+	/// <summary>
+	/// 自機ヒット時にダメージを送る
+	/// </summary>
+	/// <param name="collision">Collision.</param>
 	void OnCollisionEnter(Collision collision){
-		Debug.Log ("col");
+		Debug.Log ("hit");
+		collision.gameObject.SendMessage("Hit",damage,SendMessageOptions.DontRequireReceiver);
 	}
 
 

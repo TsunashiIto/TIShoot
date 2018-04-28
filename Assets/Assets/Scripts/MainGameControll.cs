@@ -42,15 +42,19 @@ public class MainGameControll : MonoBehaviour {
 		//受信イベント
 		TitleController.GAMESTART += this.GAMESTART;
 		GameManager.OnDestroyBoss += this.OnDestroyBoss;
+		GameManager.OnContinue += this.OnContinue;
+		GameManager.OnGameOver += this.OnGameOver;
 	}
 
 	void OnDisable(){
-		
+		TitleController.GAMESTART -= this.GAMESTART;
+		GameManager.OnDestroyBoss -= this.OnDestroyBoss;
+		GameManager.OnContinue -= this.OnContinue;
+		GameManager.OnGameOver -= this.OnGameOver;		
 	}
 
 	// Use this for initialization
 	void Start () {
-
 		SceneManager.LoadScene ("SceneTitle", LoadSceneMode.Additive);
 
 	}
@@ -82,7 +86,26 @@ public class MainGameControll : MonoBehaviour {
 		///とりあえずエンディング画面にとばす
 
 		SceneManager.LoadScene ("EndingSimple",LoadSceneMode.Additive);
+		//ここは後で現在のステージを取得する処理に変更
 		SceneManager.UnloadSceneAsync (2);
+	}
+
+	/// <summary>
+	/// コンティニュー時処理
+	/// コンティニューのウィンドウを読み込む
+	/// </summary>
+	public void OnContinue(){
+		Time.timeScale = 0;		
+		Debug.Log ("CONTINUE");
+	}
+
+	/// <summary>
+	/// ゲームオーバー時処理
+	/// なんか演出してタイトル画面に遷移する
+	/// </summary>
+	public void OnGameOver(){
+		Time.timeScale = 1;
+		Debug.Log ("GAMEOVER");
 	}
 
 }

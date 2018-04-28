@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Abstract jiki controll.
@@ -9,7 +10,7 @@ using UnityEngine;
 /// InitialChar スポーン時無敵処理
 /// MoveChar 自機のコントロール
 /// </summary>
-public class AbstractJikiControll : MonoBehaviour {
+public abstract class AbstractJikiControll : MonoBehaviour {
 
 	protected Camera cam;
 	protected bool damageEnabled = false;//eventmanager
@@ -20,6 +21,9 @@ public class AbstractJikiControll : MonoBehaviour {
 	public int HP = 1;
 	public Transform cutin;
 	public Transform bombObj;
+
+	//配信イベント
+	public static UnityAction Death;
 
 	void Awake(){
 		//set parent
@@ -40,7 +44,7 @@ public class AbstractJikiControll : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Initials the move.
+	/// スポーン時の動き。終わったらmovecharに移行.
 	/// </summary>
 	/// <returns>The move.</returns>
 	public virtual IEnumerator InitialMove(){
@@ -112,14 +116,15 @@ public class AbstractJikiControll : MonoBehaviour {
 		}
 	}
 
-
+	/// <summary>
+	/// 自機や敵の弾と接触時にsendmessageで呼び出される。
+	/// </summary>
+	/// <param name="damage">Damage.</param>
 	public virtual void Hit(int damage){
 		HP-= damage;
 		if(HP<0){
-			Debug.Log("damaged");
-			//send message to mainGameControll
-			//GameObject.Find("mainGameControll").SendMessage("death");
-
+			//イベント配信
+			Death ();
 			Destroy(gameObject);
 		}
 	}
