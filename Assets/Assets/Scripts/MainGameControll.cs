@@ -106,6 +106,10 @@ public class MainGameControll : MonoBehaviour {
 		Debug.Log ("CONTINUE");
 	}
 
+	/// <summary>
+	/// Invokes continue.
+	/// コンティニューウィンドウを開く
+	/// </summary>
 	public void InvokeContinue(){
 		Time.timeScale = 1;
 		SceneManager.UnloadSceneAsync ("ContinueControll");

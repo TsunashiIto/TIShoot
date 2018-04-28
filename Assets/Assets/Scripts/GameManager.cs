@@ -42,7 +42,6 @@ public class GameManager : MonoBehaviour {
 	public static UnityAction OnContinue;
 	//ゲームオーバー
 	public static UnityAction OnGameOver;
-	//自機やられ
 
 	//singleton
 	public static GameManager Instance { get; private set; }
@@ -141,6 +140,10 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Respawn this instance.
+	/// リスポーン処理
+	/// </summary>
 	private void Respawn(){
 		Zanki--;
 		jikiInstance = Instantiate(jiki.gameObject,new Vector3(0.0f,0.0f,-20.0f),Quaternion.identity);
@@ -157,6 +160,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// コンティニューを初期値に戻す
+	/// 残機を初期値に戻す
 	/// MaingamemanagerのOngameOverからsendmessageで呼ばれる
 	/// </summary>
 	public void ResetContinue(){
