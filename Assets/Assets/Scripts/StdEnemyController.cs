@@ -72,7 +72,6 @@ public class StdEnemyController : MonoBehaviour {
 	/// </summary>
 	/// <param name="collision">Collision.</param>
 	void OnCollisionEnter(Collision collision){
-		Debug.Log ("hit");
 		collision.gameObject.SendMessage("Hit",damage,SendMessageOptions.DontRequireReceiver);
 	}
 

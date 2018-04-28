@@ -61,7 +61,7 @@ public abstract class AbstractJikiControll : MonoBehaviour {
 			if(count>60){break;}
 			yield return new WaitForFixedUpdate();	
 		}
-		Debug.Log("break");
+
 		//bombEnabled = true;
 		StartCoroutine("MoveChar");
 	}
